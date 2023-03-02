@@ -35,12 +35,11 @@ def InsertDistributor_toDatabase():
 
     print("Distributor added to the database!")
 
-
 def delete_distributor_from_database():
-    #terminal
+    # Pairnw apo terminal 
     distributor_name = input("Enter the name of the distributor to delete: ")
 
-    # Connect to the database
+    # sundesi me basi
     mydatabase = mysql.connector.connect(
         host="localhost",
         user="root",
@@ -51,20 +50,31 @@ def delete_distributor_from_database():
     # cursorakos
     cursor = mydatabase.cursor()
 
+    # elegxw an uparxei ston pinaka Distributor
+    sql = "SELECT * FROM Distributor WHERE name_distributor = %s"
+    val = (distributor_name,)
+    cursor.execute(sql, val)
+    distributor = cursor.fetchone()
+
+    # An den uparxei, ton enimerwnw apo terminal 
+    if not distributor:
+        print(f"Distributor {distributor_name} is not in the database!")
+        cursor.close()
+        mydatabase.close()
+        return
+
+    # SBHSEEEE AN YPARXEI 
     sql = "DELETE FROM Distributor WHERE name_distributor = %s"
     val = (distributor_name,)
-
-    # Execute the SQL statement
     cursor.execute(sql, val)
 
-    # Commit the changes to the database
+    
     mydatabase.commit()
-
-    # Close the cursor and database connection
     cursor.close()
     mydatabase.close()
 
     print(f"Distributor {distributor_name} deleted from the database!")
+
 
                 
 #DOULEEEEEEEEEEEEYEI PANAGIA MOY !!!!!!!
