@@ -23,9 +23,12 @@ CREATE TABLE Aitima (
     id_aitimatos INT AUTO_INCREMENT,
     id_distr INT,
     dmin FLOAT,
+    accepted BOOLEAN,
+    declined BOOLEAN,
     PRIMARY KEY (id_aitimatos),
     FOREIGN KEY (id_distr) REFERENCES Distributor (id_distributor)
 );
+
 
 CREATE TABLE RatingFromStore (
  id_di INT, 
