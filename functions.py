@@ -270,4 +270,74 @@ def Rating_From_Costumer():
                     print("Thanks for your rating!")
                 except mysql.connector.Error as error:
                     print("Failed to insert record into RatingFromCostumer table {}".format(error))
+                    
+  def Find_Sinepeia_Distributor():
+    import mysql.connector
+
+    mydatabase = mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password="123456789",
+        database="mydatabase"
+    )
+
+    value1 = input("Give the id of the distributor: ")
+    value2 = input("Give me the date of the shift of the distributor with this id (YYYY-MM-DD): ")
+    value3 = int(input("How many hours did the distributor work at that specific shift? "))
+
+    cursor = mydatabase.cursor()
+
+    sql1 = "SELECT id_distributor FROM Distributor WHERE id_distributor=%s"
+    val1 = (value1,)
+    cursor.execute(sql1, val1)
+    result1 = cursor.fetchall()
+
+    if len(result1) == 0:
+        print("No distributor with this id found!")
+    else:
+        cursor = mydatabase.cursor()
+
+        sql2 = "SELECT date_shift FROM Shift WHERE ID_distributor_shift=%s AND date_shift=%s"
+        val2 = (value1, value2)
+        cursor.execute(sql2, val2)
+        result2 = cursor.fetchall()
+
+        if len(result2) == 0:
+            print("Distributor with that id did not work on that day!")
+        else:
+            cursor = mydatabase.cursor()
+
+            sql3 = "UPDATE Shift SET hours_worked=%s WHERE ID_distributor_shift=%s AND date_shift=%s"
+            val3 = (value3, value1, value2)
+            cursor.execute(sql3, val3)
+            mydatabase.commit()
+
+            h_expected_query = "SELECT hours_expected FROM Shift WHERE ID_distributor_shift=%s AND date_shift=%s"
+            h_expected_params = (value1, value2)
+            cursor.execute(h_expected_query, h_expected_params)
+            h_expected = cursor.fetchone()[0]
+
+            if value3 == h_expected:
+                sql4 = "UPDATE Shift SET sinepeia=1 WHERE ID_distributor_shift=%s AND date_shift=%s"
+                val4 = (value1, value2)
+                cursor.execute(sql4, val4)
+                mydatabase.commit()
+                print("O distributor den einai sinepis!")
+            else:
+                sql5 = "UPDATE Shift SET sinepeia=0 WHERE ID_distributor_shift=%s AND date_shift=%s"
+                val5 = (value1, value2)
+                cursor.execute(sql5, val5)
+                mydatabase.commit()
+                print("O distributor den einai sinepis!")
+
+            cursor.close()
+            mydatabase.close()
+
+
+
+
+
+
+
+
     
