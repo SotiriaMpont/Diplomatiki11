@@ -13,3 +13,4 @@ import functions
 #functions.Rating_from_store() 
 
 functions.Rating_From_Costumer()
+functions.Find_Best_Distributors_of_the_day_Rating_Store()
