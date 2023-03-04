@@ -35,10 +35,12 @@ CREATE TABLE RatingFromStore (
  dat_shift DATE,
  id_aitim INT,
  Rating_store TINYINT UNSIGNED NOT NULL CHECK(Rating_store BETWEEN 0 AND 5 ),
+ranking INT,
 FOREIGN KEY (id_di) REFERENCES Distributor (id_distributor),
 FOREIGN KEY (dat_shift) REFERENCES Shift (date_shift),
 FOREIGN KEY (id_aitim) REFERENCES Aitima (id_aitimatos)
 );
+
 
 CREATE TABLE RatingFromCostumer (
  id_rating_costumer INT, 
