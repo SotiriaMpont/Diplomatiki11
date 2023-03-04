@@ -46,6 +46,7 @@ CREATE TABLE RatingFromCostumer (
  id_rating_costumer INT, 
  dat_shif_costumer DATE,
  id_aitimatos_costumer INT,
+ ranking_costumer INT,
  Rating_costumer TINYINT UNSIGNED NOT NULL CHECK(Rating_costumer BETWEEN 0 AND 5 ),
 FOREIGN KEY (id_rating_costumer ) REFERENCES Distributor (id_distributor),
 FOREIGN KEY (dat_shif_costumer) REFERENCES Shift (date_shift),
