@@ -382,6 +382,48 @@ def Find_Best_Distributors_of_the_day_Rating_Store():
 
 
 
+def Find_Best_Distributors_of_the_day_Rating_Costumer():
+    mydatabase = mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password="123456789",
+        database="mydatabase"
+    )
+
+    # pairnw imeromhnia terminal 
+    hmeromhnia = input("Enter the date (YYYY-MM-DD): ")
+
+    
+    cursor = mydatabase.cursor()
+    sql = "SELECT date_shift FROM Shift WHERE date_shift = %s"
+    val = (hmeromhnia,)
+    cursor.execute(sql, val)
+    result = cursor.fetchall()
+
+    if len(result) == 0: # elegxos. Den uparxei shift me auth thn hmerominia 
+        print("Den vrethike bardia me auth thn hmerominia!")
+    else:
+        # Gia kathe dianomea pou eixe bardia auth thn hmeromhnia bres to meso oro apo to rating tou gia na breis ton kalitero 
+        
+        sql1 = "SELECT id_rating_costumer, AVG(Rating_costumer) FROM RatingFromCostumer JOIN Distributor ON RatingFromCostumer.id_rating_costumer = Distributor.id_distributor JOIN Shift ON RatingFromCostumer. dat_shif_costumer = Shift.date_shift WHERE Shift.date_shift = %s GROUP BY id_rating_costumer"
+        val1 = (hmeromhnia,)
+        cursor.execute(sql1, val1)
+        results = cursor.fetchall()
+        # kanw tous distributors ranking basi tou mesou orou tous kai tous apothikeuw stin basi
+        ranked_results = sorted(results, key=lambda x: x[1], reverse=True)[:10]
+        for i, result in enumerate(ranked_results):
+            distributor_id = result[0]
+            avg_rating = result[1]
+            print(f"{i+1}. Distributor {distributor_id} has an average rating of {avg_rating:.2f}")
+            update_sql = "UPDATE RatingFromCostumer SET ranking_costumer = %s WHERE  dat_shif_costumer = %s AND id_rating_costumer = %s"
+            update_val = (i+1, hmeromhnia, distributor_id)
+            cursor.execute(update_sql, update_val)
+
+        mydatabase.commit()
+        print("Ranking based on the average of the rating the got from costumers that day!")
+
+    cursor.close()
+    mydatabase.close()
 
 
 
