@@ -508,4 +508,89 @@ def Apodoxi_Aitimatos_Distributor():
     print(cursor.rowcount, "Eggrapsa kapou sthn bash!!!!!")
 
 
+   #den douleuei swsta to acceptance rate. to brika 2 kapoy :)
+def Find_Acceptance_rate_perShift():
+    
+    mydatabase = mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password="123456789",
+        database="mydatabase"
+    )
+
+    #terminal hmeromhnia kai id distributor 
+    hmeromhnia = input("Enter the date (YYYY-MM-DD): ")
+    id1 = input("Enter the id of the distributor: ")
+
+    cursor = mydatabase.cursor()
+
+    # metraw accepted and declined requests
+    sql = "SELECT COUNT(*) FROM Aitima WHERE id_distr = %s AND accepted = 1 AND EXISTS (SELECT * FROM Shift WHERE Shift.ID_distributor_shift = %s AND Shift.date_shift = %s)"
+    val = (id1, id1, hmeromhnia)
+    cursor.execute(sql, val)
+    accepted_count = cursor.fetchone()[0]
+
+    sql = "SELECT COUNT(*) FROM Aitima WHERE id_distr = %s AND accepted = 0 AND EXISTS (SELECT * FROM Shift WHERE Shift.ID_distributor_shift = %s AND Shift.date_shift = %s)"
+    val = (id1, id1, hmeromhnia)
+    cursor.execute(sql, val)
+    declined_count = cursor.fetchone()[0]
+
+    # briskw acceptance rate 
+    if declined_count == 0:
+        acceptance_rate = 1
+    else:
+        acceptance_rate = accepted_count / declined_count
+
+    # bazw to acceptance rate sto table Shift afou prwta to ypologisa
+    sql = "UPDATE Shift SET acceptance_rate = %s WHERE date_shift = %s AND ID_distributor_shift = %s"
+    val = (acceptance_rate, hmeromhnia, id1)
+    cursor.execute(sql, val)
+
+    mydatabase.commit()
+    print(cursor.rowcount, "Eggrafi kapou sthn bash!!!!!")
+    
+
+def Best_Distributor_Acceptance_Rate():
+    
+ mydatabase = mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password="123456789",
+        database="mydatabase"
+    )
+  
+ cursor = mydatabase.cursor()
+
+    #terminal hmeromhnia 
+ hmeromhnia = input("Enter the date (YYYY-MM-DD): ")
+  
+    #ta pairnw ola me basi to acceptance rate me au3ousa seira 
+ sql=("SELECT ID_distributor_shift, acceptance_rate FROM Shift WHERE date_shift=%s ORDER BY acceptance_rate DESC LIMIT 10") # gia na parw tous 10 prwtous 
+ val=(hmeromhnia,)
+ cursor.execute(sql,val)
+  
+    #twra thelw na emfanisw auta ta apotelesmata stin othoni mou kai meta na perasw to ranking_acceptance rate ston table best distributor
+  
+    #pame arxika na emfanisoume tous kaluterous 10 ston terminal se morfi pinaka
+  
+ rows = cursor.fetchall() # bazw oles tis grammes tou apotelesmatos pou brika apo thn basi 
+  
+    # ta ektipwnw se morfi pinaka 
+  
+ print("Top 10 distributors with the highest acceptance rates on " + hmeromhnia + ":\n")
+ print("('Distributor ID', 'Acceptance Rate')")
+ 
+ for row in rows:
+    print((row[0], row[1]))
+
+    # Close the database connection
+ mydatabase.close()
+    
+#
+
+  
+  
+  
+    
+    
     
