@@ -424,7 +424,48 @@ def Find_Best_Distributors_of_the_day_Rating_Costumer():
 
     cursor.close()
     mydatabase.close()
+    
+    
+def Apodoxi_Aitimatos_Distributor(): 
+    
+    mydatabase = mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password="123456789",
+        database="mydatabase"
+    )
 
+    cursor = mydatabase.cursor()
+    
+    #pairnw apo terminal id distributor kai aitimatos 
+    id1 = input("Dwse mou to id tou distributor: ")
+    id_aitimatos1 = input("Dwse to id tis paraggelias pou exei anatethei ston distributor: ")
+    
+    sql1 = "SELECT id_distr, id_aitimatos FROM Aitima WHERE id_distr = %s AND id_aitimatos = %s"
+    val1 = (id1, id_aitimatos1)
+    
+    cursor.execute(sql1, val1)
+    result = cursor.fetchone()
+    
+    if result is None:
+        print("Invalid distributor or order ID.")
+    else:
+        value = input("Enter 1 if the distributor will accept the order, else type 0: ")
+        
+        #elegxos an dinw apo terminal swstes times 
+        if value not in ["0", "1"]:
+            print("Please enter 0 for decline or 1 for acceptance!")
+        else:
+            accepted = "1" if value == "1" else "0"
+            declined = "1" if value == "0" else "0"
+            
+            sql2 = "UPDATE Aitima SET accepted = %s, declined = %s WHERE id_distr = %s AND id_aitimatos = %s"
+            val2 = (accepted, declined, id1, id_aitimatos1)
+            
+            cursor.execute(sql2, val2)
+            mydatabase.commit()
+            
+            print("Order status updated.")
 
 
 
