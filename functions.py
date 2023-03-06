@@ -467,6 +467,45 @@ def Apodoxi_Aitimatos_Distributor():
             
             print("Order status updated.")
 
+            def Find_Acceptance_rate_perShift():
+    
+    mydatabase = mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password="123456789",
+        database="mydatabase"
+    )
+
+    #terminal hmeromhnia kai id distributor 
+    hmeromhnia = input("Enter the date (YYYY-MM-DD): ")
+    id1 = input("Enter the id of the distributor: ")
+
+    cursor = mydatabase.cursor()
+
+    # metraw accepted and declined requests
+    sql = "SELECT COUNT(*) FROM Aitima WHERE id_distr = %s AND accepted = 1 AND EXISTS (SELECT * FROM Shift WHERE Shift.ID_distributor_shift = %s AND Shift.date_shift = %s)"
+    val = (id1, id1, hmeromhnia)
+    cursor.execute(sql, val)
+    accepted_count = cursor.fetchone()[0]
+
+    sql = "SELECT COUNT(*) FROM Aitima WHERE id_distr = %s AND accepted = 0 AND EXISTS (SELECT * FROM Shift WHERE Shift.ID_distributor_shift = %s AND Shift.date_shift = %s)"
+    val = (id1, id1, hmeromhnia)
+    cursor.execute(sql, val)
+    declined_count = cursor.fetchone()[0]
+
+    # briskw acceptance rate 
+    if declined_count == 0:
+        acceptance_rate = 1
+    else:
+        acceptance_rate = accepted_count / declined_count
+
+    # bazw to acceptance rate sto table Shift afou prwta to ypologisa
+    sql = "UPDATE Shift SET acceptance_rate = %s WHERE date_shift = %s AND ID_distributor_shift = %s"
+    val = (acceptance_rate, hmeromhnia, id1)
+    cursor.execute(sql, val)
+
+    mydatabase.commit()
+    print(cursor.rowcount, "Eggrapsa kapou sthn bash!!!!!")
 
 
     
