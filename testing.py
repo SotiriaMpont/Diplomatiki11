@@ -14,3 +14,4 @@ import functions
 
 functions.Rating_From_Costumer()
 functions.Find_Best_Distributors_of_the_day_Rating_Store()
+functions.Apodoxi_Aitimatos_Distributor()
