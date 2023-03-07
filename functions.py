@@ -502,7 +502,6 @@ def Apodoxi_Aitimatos_Distributor():
     print(cursor.rowcount, "Eggrapsa kapou sthn bash!!!!!")
 
 
-   #den douleuei swsta to acceptance rate. to brika 2 kapoy :)
 def Find_Acceptance_rate_perShift():
     
     mydatabase = mysql.connector.connect(
@@ -542,47 +541,49 @@ def Find_Acceptance_rate_perShift():
 
     mydatabase.commit()
     print("Accepted: ",cursor.rowcount, "Eggrapsa sto acceptance_rate tou shift to ",acceptance_rate)
-def Best_Distributor_Acceptance_Rate():
     
- mydatabase = mysql.connector.connect(
+
+    
+ def Best_Distributor_Acceptance_Rate():
+    
+ 
+
+    mydatabase = mysql.connector.connect(
         host="localhost",
         user="root",
         password="123456789",
         database="mydatabase"
     )
-  
- cursor = mydatabase.cursor()
 
-    #terminal hmeromhnia 
- hmeromhnia = input("Enter the date (YYYY-MM-DD): ")
-  
-    #ta pairnw ola me basi to acceptance rate me au3ousa seira 
- sql=("SELECT ID_distributor_shift, acceptance_rate FROM Shift WHERE date_shift=%s ORDER BY acceptance_rate DESC LIMIT 10") # gia na parw tous 10 prwtous 
- val=(hmeromhnia,)
- cursor.execute(sql,val)
-  
-    #twra thelw na emfanisw auta ta apotelesmata stin othoni mou kai meta na perasw to ranking_acceptance rate ston table best distributor
-  
-    #pame arxika na emfanisoume tous kaluterous 10 ston terminal se morfi pinaka
-  
- rows = cursor.fetchall() # bazw oles tis grammes tou apotelesmatos pou brika apo thn basi 
-  
-    # ta ektipwnw se morfi pinaka 
-  
- print("Top 10 distributors with the highest acceptance rates on " + hmeromhnia + ":\n")
- print("('Distributor ID', 'Acceptance Rate')")
- 
- for row in rows:
-    print((row[0], row[1]))
+    cursor = mydatabase.cursor()
+
+    # Terminal hmeromhnia
+    hmeromhnia = input("Enter the date (YYYY-MM-DD): ")
+
+    # Update SELECT statement to calculate ranking
+    sql = "SELECT ID_distributor_shift, acceptance_rate, ROW_NUMBER() OVER (ORDER BY acceptance_rate DESC) AS ranking FROM Shift WHERE date_shift = %s LIMIT 10"
+    val = (hmeromhnia,)
+    cursor.execute(sql, val)
+
+    # Fetch results and insert into BestDistributors table
+    rows = cursor.fetchall()
+    for row in rows:
+        distributor_id = row[0]
+        acceptance_rate = row[1]
+        ranking = row[2]
+
+        # Insert values into BestDistributors table
+        sql = "INSERT INTO BestDistributors (hmera_best, Id_best_distributor, Ranking_best_AccepRate) VALUES (%s, %s, %s)"
+        val = (hmeromhnia, distributor_id, ranking)
+        cursor.execute(sql, val)
+        mydatabase.commit()
+
+    # Print results to console
+    print(f"Top 10 distributors with the highest acceptance rates on {hmeromhnia}:\n")
+    print("('Distributor ID', 'Acceptance Rate', 'Ranking_Accep_Rate')")
+    for row in rows:
+        print((row[0], row[1], row[2]))
 
     # Close the database connection
- mydatabase.close()
-    
-#
-
-  
-  
-  
-    
-    
+    mydatabase.close()   
     
