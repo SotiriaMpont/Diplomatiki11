@@ -140,7 +140,7 @@ def Kataxwrise_Aitima_database():
 
  
     
-#                DEN LEITOURGEI
+
 
 def Rating_from_store():
     value1 = input("Enter the id of the distributor you want to evaluate: ")
@@ -330,7 +330,6 @@ def Rating_From_Costumer():
 
 
 
-#in the making (douleeeeeeeuueiii!!!!!!!!!!!!!!!!!!!)
 # briskw me basi thn mera ton distributor pou exei to kalutero rating apo katastima kai tous kanw ranking!
 def Find_Best_Distributors_of_the_day_Rating_Store():
     mydatabase = mysql.connector.connect(
@@ -520,13 +519,13 @@ def Find_Acceptance_rate_perShift():
     cursor = mydatabase.cursor()
 
     # metraw accepted and declined requests
-    sql = "SELECT COUNT(*) FROM Aitima WHERE id_distr = %s AND accepted = 1 AND EXISTS (SELECT * FROM Shift WHERE Shift.ID_distributor_shift = %s AND Shift.date_shift = %s)"
-    val = (id1, id1, hmeromhnia)
+    sql = "SELECT COUNT(*) FROM Aitima WHERE id_distr = %s AND accepted = 1 AND hmeromhnia_aitimatos=%sAND EXISTS (SELECT * FROM Shift WHERE Shift.ID_distributor_shift = %s AND Shift.date_shift = %s)"
+    val = (id1, hmeromhnia, id1, hmeromhnia)
     cursor.execute(sql, val)
     accepted_count = cursor.fetchone()[0]
 
-    sql = "SELECT COUNT(*) FROM Aitima WHERE id_distr = %s AND accepted = 0 AND EXISTS (SELECT * FROM Shift WHERE Shift.ID_distributor_shift = %s AND Shift.date_shift = %s)"
-    val = (id1, id1, hmeromhnia)
+    sql = "SELECT COUNT(*) FROM Aitima WHERE id_distr = %s AND accepted = 0 AND hmeromhnia_aitimatos=%s AND EXISTS (SELECT * FROM Shift WHERE Shift.ID_distributor_shift = %s AND Shift.date_shift = %s)"
+    val = (id1, hmeromhnia, id1, hmeromhnia)
     cursor.execute(sql, val)
     declined_count = cursor.fetchone()[0]
 
@@ -534,7 +533,7 @@ def Find_Acceptance_rate_perShift():
     if declined_count == 0:
         acceptance_rate = 1
     else:
-        acceptance_rate = accepted_count / declined_count
+        acceptance_rate = accepted_count / (declined_count + accepted_count)
 
     # bazw to acceptance rate sto table Shift afou prwta to ypologisa
     sql = "UPDATE Shift SET acceptance_rate = %s WHERE date_shift = %s AND ID_distributor_shift = %s"
@@ -542,9 +541,7 @@ def Find_Acceptance_rate_perShift():
     cursor.execute(sql, val)
 
     mydatabase.commit()
-    print(cursor.rowcount, "Eggrafi kapou sthn bash!!!!!")
-    
-
+    print("Accepted: ",cursor.rowcount, "Eggrapsa sto acceptance_rate tou shift to ",acceptance_rate)
 def Best_Distributor_Acceptance_Rate():
     
  mydatabase = mysql.connector.connect(
