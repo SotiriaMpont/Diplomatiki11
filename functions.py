@@ -112,38 +112,33 @@ def Dilwsi_Shift():
     print(cursor.rowcount, "shift added to the database!")
     print("Euxaristoume pou katoxirwses tis wres sou!")
     
-    
 def Kataxwrise_Aitima_database():
-    #dinw timi apo ton terminal 
-    value= input("dese to id tou dianomea poy thes na analabei to aitima :")
-    
-    #kanw connection tou python file mou me tin mydatabase
+   
+    # dinw timi apo ton terminal 
+    value = input("dese to id tou dianomea poy thes na analabei to aitima :")
+    date = input("dese ti imerominia tou aitimatos (yyyy-mm-dd):")
+
+    # kanw connection tou python file mou me tin mydatabase
     mydatabase = mysql.connector.connect(
         host="localhost",
         user="root",
         password="123456789",
         database="mydatabase"
     )
-     
+
     # ftiaxnw ton cursorako pou allilepidra me database
     cursor = mydatabase.cursor()
-     
-    #edw pairnei thn timi apo ton terminal kai tin bazei stin basi
-    sql = "INSERT INTO Aitima (id_distr) VALUES (%s)"
-    val = (value,)
-    
+
+    # edw pairnei thn timi apo ton terminal kai tin bazei stin basi
+    sql = "INSERT INTO Aitima (id_distr, accepted, declined, hmeromhnia_aitimatos) VALUES (%s, 0, 0, %s)"
+    val = (value, date)
+
     # execute the SQL 
     cursor.execute(sql, val)
-    
-    #kanw panta ena commit 
     mydatabase.commit()
+         
 
-    # close the cursor and database connection
-    cursor.close()
-    mydatabase.close()
-
-    print("To aitima paraggelias anatethike ston distributor!")
-    
+ 
     
 #                DEN LEITOURGEI
 
