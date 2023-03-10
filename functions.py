@@ -1,4 +1,5 @@
 import mysql.connector
+import datetime
 
 #Inser a Distributor to the Database
 
@@ -167,8 +168,8 @@ def Dilwsi_Shift():
 def Kataxwrise_Aitima_database():
    
     # dinw timi apo ton terminal 
-    value = input("dese to id tou dianomea poy thes na analabei to aitima :")
-    date = input("dese ti imerominia tou aitimatos (yyyy-mm-dd):")
+    value = input("Give me the id of the distributor you want to get  the request :")
+    date = input("Give the date of the request (yyyy-mm-dd) :")
 
     # kanw connection tou python file mou me tin mydatabase
     mydatabase = mysql.connector.connect(
@@ -180,17 +181,45 @@ def Kataxwrise_Aitima_database():
 
     # ftiaxnw ton cursorako pou allilepidra me database
     cursor = mydatabase.cursor()
-
-    # edw pairnei thn timi apo ton terminal kai tin bazei stin basi
-    sql = "INSERT INTO Aitima (id_distr, accepted, declined, hmeromhnia_aitimatos) VALUES (%s, 0, 0, %s)"
-    val = (value, date)
-
-    # execute the SQL 
+    
+    #tsekarw an o dianomeas me auto to id uparxei sthn basi 
+    
+    sql = "SELECT id_distributor FROM Distributor WHERE id_distributor = %s"
+    val = (value,)
     cursor.execute(sql, val)
-    mydatabase.commit()
-         
+    result = cursor.fetchone()
+    
+    if result is None:
+        print(f"The distributor with id '{value}' does not exist in the database")
+    else:   
+        #  # input imerominia
+       
 
- 
+        # elegxos an i hmerominia einai valid! px den thelw na balw to 1821 ws mera bardias.
+        try:
+            date = datetime.datetime.strptime(date, '%Y-%m-%d')
+            if date.year < datetime.datetime.now().year: #mono gia to etos 2021 kai panw ton afinw 
+                print("Invalid year entered.")
+            elif date.month < 1 or date.month > 12: #profanws ama baleis mina 13 d
+                print("Invalid month entered.")
+            elif date.day < 1 or date.day > 31: # 38 tou mina 
+                print("Invalid day entered.")
+            else:
+                print("Date entered is valid.")
+        except ValueError:
+            print("Invalid date format entered.")
+        
+        
+        # AN OLA BAINOUN KALWS, PAME LIGO GIA TO INSERTTTTT 
+        # edw pairnei thn timi apo ton terminal kai tin bazei stin basi
+        sql = "INSERT INTO Aitima (id_distr, accepted, declined, date_aitimatos) VALUES (%s, 0, 0, %s)"
+        val = (value, date)
+
+        print(cursor.rowcount, "Egine anathesi ston dianomea!")   
+        # execute the SQL 
+        cursor.execute(sql, val)
+        mydatabase.commit()
+        
     
 
 
