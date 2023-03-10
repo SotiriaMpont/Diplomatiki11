@@ -208,20 +208,29 @@ def Kataxwrise_Aitima_database():
                 print("Date entered is valid.")
         except ValueError:
             print("Invalid date format entered.")
-        
-        
-        # AN OLA BAINOUN KALWS, PAME LIGO GIA TO INSERTTTTT 
-        # edw pairnei thn timi apo ton terminal kai tin bazei stin basi
-        sql = "INSERT INTO Aitima (id_distr, accepted, declined, date_aitimatos) VALUES (%s, 0, 0, %s)"
+            
+            
+        #elegxos an h hmeromhnia aitimatos tairiazei me thn hmeromhnia pou exei shift o man. alliwa ti nohma exei? 
+        #mhn ton afinei na kanei anathesi ama den exei bardia o dianomeas!!!!
+        sql = "SELECT * FROM Shift WHERE ID_distributor_shift = %s AND date_shift = %s"
         val = (value, date)
-
-        print(cursor.rowcount, "Egine anathesi ston dianomea!")   
-        # execute the SQL 
         cursor.execute(sql, val)
-        mydatabase.commit()
-        
-    
+        shift_result = cursor.fetchone()
 
+        if shift_result is None:
+            print(f"The distributor with id '{value}' does not have a shift on {date}! Den egine h anathesi tou aitimatos!")
+        else:
+            # AN OLA BAINOUN KALWS, PAME LIGO GIA TO INSERTTTTT 
+            # edw pairnei thn timi apo ton terminal kai tin bazei stin basi
+            sql = "INSERT INTO Aitima (id_distr, accepted, declined, date_aitimatos) VALUES (%s, 0, 0, %s)"
+            val = (value, date)
+
+            print(cursor.rowcount, "Egine anathesi ston dianomea!")   
+            # execute the SQL 
+            cursor.execute(sql, val)
+            mydatabase.commit()
+        
+        
 
 def Rating_from_store():
     value1 = input("Enter the id of the distributor you want to evaluate: ")
