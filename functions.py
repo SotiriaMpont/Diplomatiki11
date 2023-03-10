@@ -77,40 +77,92 @@ def delete_distributor_from_database():
 
 
                 
-#DOULEEEEEEEEEEEEYEI PANAGIA MOY !!!!!!!
 def Dilwsi_Shift():
-    # Get input from the user
-    distributor_id = input("Enter the id of the distributor: ")
-    date_shift = input("Enter the date (YYYY-MM-DD): ")
-    hours_expected = float(input("Enter the hours that you will work: "))
-    
-    # Add a new parameter for ID_distributor_shift
-    ID_distributor_shift = distributor_id
-
-    active = 1
-    hours_worked = 0
-    Sinepeia = 0
-    Total_aitimata_per_shift = 0
-    
-    # Connect to the MySQL database
+    # sundesi me basi
     mydatabase = mysql.connector.connect(
         host="localhost",
         user="root",
         password="123456789",
         database="mydatabase"
     )
-    
+
+    # cursorakos
     cursor = mydatabase.cursor()
     
-    sql = "INSERT INTO shift (date_shift, ID_distributor_shift, acceptance_rate, active, hours_expected, hours_worked, Sinepeia, Total_aitimata_per_shift) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
-    val = (date_shift, ID_distributor_shift, 0, active, hours_expected, hours_worked, Sinepeia, Total_aitimata_per_shift)
-
+    #input to id tou dianomea 
+    distributor_id = input("Enter the id of the distributor you want to declare a shift : ")
+    
+    #yparxei autos o dianomeas stin basi?
+    
+    sql = "SELECT id_distributor FROM Distributor WHERE id_distributor = %s"
+    val = (distributor_id,)
     cursor.execute(sql, val)
+    result = cursor.fetchone()
+    
+    if result is None:
+        print(f"The distributor with id '{distributor_id}' does not exist in the database")
+    else:    
+        # input imerominia
+        Hmerominia = input("Enter the date (YYYY-MM-DD): ")
+        date_obj = datetime.datetime.strptime(Hmerominia, '%Y-%m-%d')
 
-    mydatabase.commit()
+        # elegxos an i hmerominia einai valid! px den thelw na balw to 1821 ws mera bardias.
+        try:
+            Hmerominia = datetime.datetime.strptime(Hmerominia, '%Y-%m-%d')
+            if Hmerominia.year < datetime.datetime.now().year: #mono gia to etos 2021 kai panw ton afinw 
+                print("Invalid year entered.")
+            elif Hmerominia.month < 1 or Hmerominia.month > 12: #profanws ama baleis mina 13 d
+                print("Invalid month entered.")
+            elif Hmerominia.day < 1 or Hmerominia.day > 31: # 38 tou mina 
+                print("Invalid day entered.")
+            else:
+                print("Date entered is valid.")
+        except ValueError:
+            print("Invalid date format entered.")
+                
+        #an isxioun ola ta parapanw zita kai wra enar3is/li3is  bardias apo terminal 
+        # zhtaw wra enarxis
+       # zhtaw wra enarxis
+        wra_enarxis_shift = input("Enter the time that the shift starts (HH:MM:SS): ")
+        try:
+            time_obj = datetime.datetime.strptime(wra_enarxis_shift, '%H:%M:%S')
+            print("Time entered is valid.")
+        except ValueError:
+            print("Invalid time format entered.")
+                
+        # zhtaw wra li3is shift 
+        wra_lixis_shift = input("Enter the time that the shift ends (HH:MM:SS): ")
+        try:
+            time_obj = datetime.datetime.strptime(wra_lixis_shift, '%H:%M:%S')
+            print("Time entered is valid.")
+        except ValueError:
+            print("Invalid time format entered.")
+                    
+        # elegxos profanws na mhn einai h wra li3is mikroteri apo thn enarxis
+        start_time_obj = datetime.datetime.strptime(wra_enarxis_shift, '%H:%M:%S')
+        end_time_obj = datetime.datetime.strptime(wra_lixis_shift, '%H:%M:%S')
 
-    print(cursor.rowcount, "shift added to the database!")
-    print("Euxaristoume pou katoxirwses tis wres sou!")
+        if start_time_obj >= end_time_obj:
+            print("Error: Start time of shift must be before end time.")
+        else:
+            print("Shift times are valid.")
+        
+        #poses wres doulepse. 
+        duration = end_time_obj - start_time_obj
+        print(f"Shift duration is {duration}")
+        
+        
+        #afou einai swsta, pame na ta kanoume insert stin database
+
+        sql = "INSERT INTO Shift (date_shift, ID_distributor_shift, time_starts, time_ends, hours_expected) VALUES (%s, %s, %s, %s, %s)"
+        val = (Hmerominia, result[0], wra_enarxis_shift, wra_lixis_shift, duration)
+
+        # Execute 
+        cursor.execute(sql, val)
+        mydatabase.commit()
+
+        # Gia na eimai sigouri oti egine h eggrafi stin basi
+        print(cursor.rowcount, "record inserted.") 
     
 def Kataxwrise_Aitima_database():
    
