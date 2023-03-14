@@ -293,13 +293,15 @@ def Rating_from_store():
                 except mysql.connector.Error as error:
                     print("Failed to insert record into Rating_From_Store table {}".format(error))
                     
-                    
-def Rating_From_Costumer():
+ def Rating_From_Costumer():
     
     value1 = input("Enter the id of the distributor you want to evaluate: ")
     value2 = input("Enter the date of the delivery: ")
     value3 = input("Enter the id of the order: ")
-    value4 = input("How would you rate the distributor from scale to 0-5 for that delivery? ")
+    value4 = input("How would you rate the distributor from scale 0-5 for the speed of the delivery? ")
+    value5= input("How would you rate the distributor from scale 0-5 for the accuracy of the delivery? ")
+    value6=input("How would you rate the distributor from scale 0-5 for general user experience? Was this distributor polite? ")
+   
 
     mydatabase = mysql.connector.connect(
         host="localhost",
@@ -344,8 +346,8 @@ def Rating_From_Costumer():
                 print("We cannot find the id of that specific order!")
             else:
                 cursor = mydatabase.cursor()
-                sql4 = "INSERT INTO RatingFromCostumer (id_rating_costumer, dat_shif_costumer, id_aitimatos_costumer, Rating_costumer) VALUES (%s, %s, %s, %s)"
-                val4 = (result1[0][0], value2, value3, value4)
+                sql4 = "INSERT INTO RatingFromCostumer (id_rating_costumer, dat_shif_costumer, id_aitimatos_costumer, criterion1,criterion2,criterion3) VALUES (%s, %s, %s, %s,%s,%s)"
+                val4 = (result1[0][0], value2, value3, value4,value5,value6)
 
                 try:
                     cursor.execute(sql4, val4)
@@ -354,8 +356,8 @@ def Rating_From_Costumer():
                     mydatabase.close()
                     print("Thanks for your rating!")
                 except mysql.connector.Error as error:
-                    print("Failed to insert record into RatingFromCostumer table {}".format(error))
-                    
+                    print("Failed to insert record into RatingFromCostumer table {}".format(error))                   
+
   def Find_Sinepeia_Distributor():
     import mysql.connector
 
