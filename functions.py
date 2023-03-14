@@ -230,8 +230,6 @@ def Kataxwrise_Aitima_database():
             cursor.execute(sql, val)
             mydatabase.commit()
         
-        
-
 def Rating_from_store():
     value1 = input("Enter the id of the distributor you want to evaluate: ")
     value2 = input("Enter the date of the delivery: ")
@@ -247,39 +245,29 @@ def Rating_from_store():
 
     cursor = mydatabase.cursor()
 
-    sql1 = "SELECT  id_distributor FROM Distributor WHERE  id_distributor=%s"
+    sql1 = "SELECT id_distributor FROM Distributor WHERE id_distributor=%s"
     val1 = (value1,)
     cursor.execute(sql1, val1)
     result1 = cursor.fetchall()
-    
-    print(result1)
 
     if len(result1) == 0:
-        print("No distributor with this name found!")
-        
-        
-    
-    
+        print("No distributor with this id found!")
     else:
-        
-        # Check if order exists
-        sql2 = "SELECT id_aitimatos FROM Aitima WHERE id_aitimatos=%s"
-        val2 = (value3,)
+        # Check if rating already exists
+        sql2 = "SELECT * FROM RatingFromStore WHERE id_di=%s AND dat_shift=%s AND id_aitim=%s"
+        val2 = (result1[0][0], value2, value3)
         cursor.execute(sql2, val2)
         result2 = cursor.fetchall()
 
-        if len(result2) == 0:
-            print("That specific distributor did not work on that day!")
-        else:
-            # Check if shift exists
-            sql3 = "SELECT date_shift FROM Shift WHERE date_shift=%s"
-            val3 = (value2,)
-            cursor.execute(sql3, val3)
-            result3 = cursor.fetchall()
+        if len(result2) > 0:
+            print("A rating for this distributor, delivery date, and order ID already exists.")
+            choice = input("Do you want to delete the old rating and insert the new rating? (yes/no): ")
+            if choice.lower() == "yes":
+                cursor = mydatabase.cursor()
+                sql3 = "DELETE FROM RatingFromStore WHERE id_di=%s AND dat_shift=%s AND id_aitim=%s"
+                val3 = (result1[0][0], value2, value3)
+                cursor.execute(sql3, val3)
 
-            if len(result3) == 0:
-                print("We cannot find the id of that specific order!")
-            else:
                 cursor = mydatabase.cursor()
                 sql4 = "INSERT INTO RatingFromStore (id_di, dat_shift, id_aitim, Rating_store) VALUES (%s, %s, %s, %s)"
                 val4 = (result1[0][0], value2, value3, value4)
@@ -292,6 +280,23 @@ def Rating_from_store():
                     print("Thanks for your rating!")
                 except mysql.connector.Error as error:
                     print("Failed to insert record into Rating_From_Store table {}".format(error))
+        else:
+            cursor = mydatabase.cursor()
+            sql4 = "INSERT INTO RatingFromStore (id_di, dat_shift, id_aitim, Rating_store) VALUES (%s, %s, %s, %s)"
+            val4 = (result1[0][0], value2, value3, value4)
+
+            try:
+                cursor.execute(sql4, val4)
+                mydatabase.commit()
+                cursor.close()
+                mydatabase.close()
+                print("Thanks for your rating!")
+            except mysql.connector.Error as error:
+                print("Failed to insert record into Rating_From_Store table {}".format(error))
+     
+       
+
+
                     
  def Rating_From_Costumer():
     
