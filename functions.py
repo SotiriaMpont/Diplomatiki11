@@ -222,13 +222,32 @@ def Kataxwrise_Aitima_database():
         else:
             # AN OLA BAINOUN KALWS, PAME LIGO GIA TO INSERTTTTT 
             # edw pairnei thn timi apo ton terminal kai tin bazei stin basi
-            sql = "INSERT INTO Aitima (id_distr, accepted, declined, date_aitimatos) VALUES (%s, 0, 0, %s)"
-            val = (value, date)
+            
+            #estw ta oria gia thn patra ama den ebaza oria tha epiane olo ton kosmo 
+            # Patras bounds
+            lat_min, lat_max = 38.2228, 38.3149
+            lon_min, lon_max = 21.6945, 21.7895
+
+            #pame na ftiaxoume ena shmeio gia tin topothesia tou katastimatos 
+            store_lat, store_lon = random.uniform(lat_min, lat_max), random.uniform(lat_min, lat_max)
+        
+            # tuxaio simeio gia tin topothesia tou costumer 
+            costumer_lat, costumer_lon = random.uniform(lat_min, lat_max), random.uniform(lat_min, lat_max)
+        
+            #expected km 
+            distance = geodesic((store_lat, store_lon), (costumer_lat, costumer_lon)).km
+        
+            #pame twra na ta kanoume insert ston pinaka Aitima ta panta
+            
+            sql = "INSERT INTO Aitima (id_distr, accepted, declined, date_aitimatos,latitude_store, longitude_store,latitude_costomer,longtitude_costumer,expected_difference_km) VALUES (%s, 0, 0, %s,%s, %s, %s,%s,%s)"
+            val = (value, date,store_lat,store_lon,costumer_lat,costumer_lon,distance)
 
             print(cursor.rowcount, "Egine anathesi ston dianomea!")   
             # execute the SQL 
             cursor.execute(sql, val)
             mydatabase.commit()
+        
+    
         
 def Rating_from_store():
     value1 = input("Enter the id of the distributor you want to evaluate: ")
