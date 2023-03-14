@@ -409,7 +409,7 @@ def Rating_from_store():
                 val4 = (value1, value2)
                 cursor.execute(sql4, val4)
                 mydatabase.commit()
-                print("O distributor den einai sinepis!")
+                print("O distributor einai sinepis!")
             else:
                 sql5 = "UPDATE Shift SET sinepeia=0 WHERE ID_distributor_shift=%s AND date_shift=%s"
                 val5 = (value1, value2)
