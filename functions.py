@@ -512,6 +512,7 @@ def Find_Best_Distributors_of_the_day_Rating_Costumer():
     
 def Apodoxi_Aitimatos_Distributor(): 
     
+    
     mydatabase = mysql.connector.connect(
         host="localhost",
         user="root",
@@ -524,34 +525,68 @@ def Apodoxi_Aitimatos_Distributor():
     #pairnw apo terminal id distributor kai aitimatos 
     id1 = input("Dwse mou to id tou distributor: ")
     id_aitimatos1 = input("Dwse to id tis paraggelias pou exei anatethei ston distributor: ")
+    date_input = input("Dwse tin imerominia tis paraggelias (YYYY-MM-DD): ")
+    time_input = input("Dwse tin ora tis paraggelias (HH:MM:SS): ")
+
+    # check if date is valid
+    try:
+        date_input = datetime.datetime.strptime(date_input, "%Y-%m-%d")
+    except ValueError:
+        print("Invalid date format. Please use YYYY-MM-DD.")
+        return
     
-    sql1 = "SELECT id_distr, id_aitimatos FROM Aitima WHERE id_distr = %s AND id_aitimatos = %s"
-    val1 = (id1, id_aitimatos1)
+    # check if time is valid
+    try:
+        time_input = datetime.datetime.strptime(time_input, "%H:%M:%S")
+    except ValueError:
+        print("Invalid time format. Please use HH:MM:SS.")
+        return
+
+    # check if shift exists for the given date and distributor
+    sql_shift = "SELECT time_starts, time_ends FROM Shift WHERE date_shift = %s AND ID_distributor_shift = %s"
+    val_shift = (date_input, id1)
+    cursor.execute(sql_shift, val_shift)
+    shift_result = cursor.fetchone()
+
+    if shift_result is None:
+        print("Invalid distributor or order ID or date.")
+        return
+
+    shift_start = datetime.datetime.strptime(str(shift_result[0]), "%H:%M:%S")
+    shift_end = datetime.datetime.strptime(str(shift_result[1]), "%H:%M:%S")
+
+    if time_input < shift_start or time_input > shift_end:
+        print("The order was not placed during the distributor's shift.")
+        return
     
-    cursor.execute(sql1, val1)
-    result = cursor.fetchone()
+    sql_aitima = "SELECT id_distr, id_aitimatos FROM Aitima WHERE id_distr = %s AND id_aitimatos = %s"
+    val_aitima = (id1, id_aitimatos1)
     
-    if result is None:
+    cursor.execute(sql_aitima, val_aitima)
+    aitima_result = cursor.fetchone()
+    
+    if aitima_result is None:
         print("Invalid distributor or order ID.")
+        return
     else:
         value = input("Enter 1 if the distributor will accept the order, else type 0: ")
         
         #elegxos an dinw apo terminal swstes times 
         if value not in ["0", "1"]:
             print("Please enter 0 for decline or 1 for acceptance!")
-        else:
-            accepted = "1" if value == "1" else "0"
-            declined = "1" if value == "0" else "0"
+            return
+        
+        accepted = "1" if value == "1" else "0"
+        declined = "1" if value == "0" else "0"
+        
+        sql_update = "UPDATE Aitima SET accepted = %s, declined = %s, time_aitimatos = %s WHERE id_distr = %s AND id_aitimatos = %s"
+        val_update = (accepted, declined, time_input, id1, id_aitimatos1)
+        
+        cursor.execute(sql_update, val_update)
+        mydatabase.commit()
+        
+        print("Order status updated.")
             
-            sql2 = "UPDATE Aitima SET accepted = %s, declined = %s WHERE id_distr = %s AND id_aitimatos = %s"
-            val2 = (accepted, declined, id1, id_aitimatos1)
-            
-            cursor.execute(sql2, val2)
-            mydatabase.commit()
-            
-            print("Order status updated.")
-
-            def Find_Acceptance_rate_perShift():
     
     mydatabase = mysql.connector.connect(
         host="localhost",
@@ -581,7 +616,7 @@ def Apodoxi_Aitimatos_Distributor():
     if declined_count == 0:
         acceptance_rate = 1
     else:
-        acceptance_rate = accepted_count / declined_count
+        acceptance_rate = accepted_count / (declined_count + accepted_count)
 
     # bazw to acceptance rate sto table Shift afou prwta to ypologisa
     sql = "UPDATE Shift SET acceptance_rate = %s WHERE date_shift = %s AND ID_distributor_shift = %s"
@@ -589,7 +624,7 @@ def Apodoxi_Aitimatos_Distributor():
     cursor.execute(sql, val)
 
     mydatabase.commit()
-    print(cursor.rowcount, "Eggrapsa kapou sthn bash!!!!!")
+    print(cursor.rowcount, "Eggrapsa sthn bash!!!!!")
 
 
 def Find_Acceptance_rate_perShift():
